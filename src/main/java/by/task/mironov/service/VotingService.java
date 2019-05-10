@@ -56,7 +56,7 @@ public class VotingService {
     public void doVote(UUID id, UUID itemId) {
         Voting voting = votingStorageService.findById(id);
         if (voting.getFlag().equals(Role.STOP)) {
-            throw new IllegalArgumentException("you cannot vote because voting is stopped");
+            throw new IllegalStateException("you cannot vote because voting is stopped");
         }
         voting.getVotingItemMap().get(itemId).setItemsCount(voting.getVotingItemMap().get(itemId).getItemsCount() + 1);
         votingStorageService.save(voting);

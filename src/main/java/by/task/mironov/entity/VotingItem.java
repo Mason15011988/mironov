@@ -7,11 +7,12 @@ import java.util.UUID;
 
 @Data
 public class VotingItem implements Serializable {
-    private String description;
     private UUID id;
+    private String name;
     private Integer itemsCount = 0;
 
-    public VotingItem() {
+    public VotingItem(String name) {
         this.id = UUID.randomUUID();
+        this.name = name;
     }
 }

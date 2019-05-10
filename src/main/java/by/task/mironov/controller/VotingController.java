@@ -22,28 +22,29 @@ public class VotingController {
         return votingService.getVoting(id);
     }
 
-    @GetMapping(path = "/{id}/items/{idItem}", produces = "application/json")
-    public VotingItem getVotingItems(@PathVariable("id") UUID id, @PathVariable("idItem") UUID idItem) {
-        return votingService.getVotingItems(id, idItem);
+    @GetMapping(path = "/{id}/items/{itemId}", produces = "application/json")
+    public VotingItem getVotingItems(@PathVariable("id") UUID id, @PathVariable("itemId") UUID itemId) {
+        return votingService.getVotingItem(id, itemId);
     }
 
-    @GetMapping(path = "/{id}/items/{idItem}/voting")
-    public String voting(@PathVariable("id") UUID id, @PathVariable("idItem") UUID idItem) {
-        return votingService.voting(id, idItem);
+    @PutMapping(path = "/{id}/items/{itemId}")
+    public void doVote(@PathVariable("id") UUID id, @PathVariable("itemId") UUID itemId) {
+        votingService.doVote(id, itemId);
     }
 
     @GetMapping(path = "/{id}/start")
-    public String startVoting(@PathVariable("id") UUID id) {
+    public void startVoting(@PathVariable("id") UUID id) {
         votingService.startVoting(id);
-        return "start voting";
     }
 
     @GetMapping(path = "/{id}/stop")
-    public String stopVoting(@PathVariable("id") UUID id) {
+    public void stopVoting(@PathVariable("id") UUID id) {
         votingService.stopVoting(id);
-        return "stop voting";
     }
 
+    /**
+     * Создаем тему для голосования и генерируем ссылку
+     **/
     @PostMapping(path = "/{id}/items", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createVotingItem(@RequestBody String name, @PathVariable("id") UUID id) {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -53,6 +54,9 @@ public class VotingController {
         return ResponseEntity.created(location).build();
     }
 
+    /**
+     * Создаем вариант для голосования и генерируем ссылку
+     **/
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> createVoting(@RequestBody String name) {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()

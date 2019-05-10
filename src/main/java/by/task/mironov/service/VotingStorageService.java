@@ -8,15 +8,15 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-public class StorageService {
+public class VotingStorageService {
 
     private Map<UUID, Voting> votingStorage = new HashMap<>();
 
-    public void saveVoting(Voting voting) {
+    public void save(Voting voting) {
         votingStorage.put(voting.getId(), voting);
     }
 
-    public Voting findVotingById(UUID id) {
+    public Voting findById(UUID id) {
         return votingStorage.get(id);
     }
 }

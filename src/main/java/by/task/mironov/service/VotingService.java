@@ -2,65 +2,63 @@ package by.task.mironov.service;
 
 import by.task.mironov.entity.Voting;
 import by.task.mironov.entity.VotingItem;
-import org.springframework.beans.factory.annotation.Autowired;
+import by.task.mironov.role.Role;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.UUID;
 
 @Component
 public class VotingService {
 
-    @Autowired
-    public StorageService storageService;
+    @Resource
+    public VotingStorageService votingStorageService;
 
     public UUID createVoting(String name) {
-        Voting voting = new Voting();
-        voting.setDescription(name);
-        storageService.saveVoting(voting);
+        Voting voting = new Voting(name);
+        votingStorageService.save(voting);
         return voting.getId();
     }
 
     public void startVoting(UUID id) {
-        Voting voting = storageService.findVotingById(id);
-        if (!voting.getFlag().equals("start")) {
-            voting.setFlag("start");
-            storageService.saveVoting(voting);
+        Voting voting = votingStorageService.findById(id);
+        if (!voting.getFlag().equals(Role.START)) {
+            voting.setFlag(Role.START);
+            votingStorageService.save(voting);
         }
     }
 
     public void stopVoting(UUID id) {
-        Voting voting = storageService.findVotingById(id);
-        if (!voting.getFlag().equals("stop")) {
-            voting.setFlag("stop");
-            storageService.saveVoting(voting);
+        Voting voting = votingStorageService.findById(id);
+        if (!voting.getFlag().equals(Role.STOP)) {
+            voting.setFlag(Role.STOP);
+            votingStorageService.save(voting);
         }
     }
 
     public UUID createVotingItem(String name, UUID id) {
-        VotingItem votingItem = new VotingItem();
-        votingItem.setDescription(name);
-        Voting voting = storageService.findVotingById(id);
+        VotingItem votingItem = new VotingItem(name);
+        Voting voting = votingStorageService.findById(id);
         voting.getVotingItemMap().put(votingItem.getId(), votingItem);
-        storageService.saveVoting(voting);
+        votingStorageService.save(voting);
         return votingItem.getId();
     }
 
     public Voting getVoting(UUID id) {
-        return storageService.findVotingById(id);
+        return votingStorageService.findById(id);
     }
 
-    public VotingItem getVotingItems(UUID id, UUID idItem) {
-        Voting voting = storageService.findVotingById(id);
-        return voting.getVotingItemMap().get(idItem);
+    public VotingItem getVotingItem(UUID id, UUID itemId) {
+        Voting voting = votingStorageService.findById(id);
+        return voting.getVotingItemMap().get(itemId);
     }
 
-    public String voting(UUID id, UUID idItem) {
-        Voting voting = storageService.findVotingById(id);
-        if (voting.getFlag().equals("start")) {
-            voting.getVotingItemMap().get(idItem).setItemsCount(voting.getVotingItemMap().get(idItem).getItemsCount() + 1);
-            storageService.saveVoting(voting);
-            return "voting is successful";
+    public void doVote(UUID id, UUID itemId) {
+        Voting voting = votingStorageService.findById(id);
+        if (voting.getFlag().equals(Role.STOP)) {
+            throw new IllegalArgumentException("you cannot vote because voting is stopped");
         }
-        return "you cannot vote because voting is stopped";
+        voting.getVotingItemMap().get(itemId).setItemsCount(voting.getVotingItemMap().get(itemId).getItemsCount() + 1);
+        votingStorageService.save(voting);
     }
 }
